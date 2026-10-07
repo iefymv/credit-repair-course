@@ -207,6 +207,14 @@ textarea{width:100%;min-height:140px;font:inherit;font-size:15px;padding:12px;bo
 .filters button.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:14px;z-index:50}
 
+
+/* read-aloud */
+.tts-cur{background:var(--warn-soft);box-shadow:0 0 0 4px var(--warn-soft);border-radius:4px;transition:background .2s}
+.tts-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:45;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;padding:8px 10px;border-radius:12px;background:var(--fg);color:var(--bg);box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100vw - 24px)}
+.tts-bar button,.tts-bar select{font:inherit;font-size:14px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid transparent;background:var(--bg);color:var(--fg);cursor:pointer}
+.tts-bar .st{font-size:13px;opacity:.85;padding:0 4px;white-space:nowrap}
+.btn.sm{font-size:14px;padding:6px 12px}
+[data-tts-ready] #view .tts-click{cursor:pointer}
 @media (max-width:900px){
   .app{grid-template-columns:minmax(0,1fr)}
   .side{position:fixed;inset:0 auto 0 0;width:min(86vw,340px);height:100%;z-index:40;transform:translateX(-102%);transition:transform .25s;padding-top:calc(20px + env(safe-area-inset-top,0px))}
@@ -375,7 +383,7 @@ function viewHome(){
 }
 
 function viewStart(){
-  return '<div class="crumbs"><a href="#home">Содержание</a> › Модуль 0</div><div class="lhead"><div class="label">Модуль 0 · Старт</div><h1>Как устроен курс</h1></div>'+
+  return '<div class="crumbs"><a href="#home">Содержание</a> › Модуль 0</div><div class="lhead"><div class="label">Модуль 0 · Старт</div><h1>Как устроен курс</h1><div class="lmeta"><button class="btn ghost sm" type="button" data-tts="start">▶ Читать вслух</button></div></div>'+
   '<div class="prose"><p>Курс ведёт от полного нуля до уровня, на котором ты разбираешь кредитный отчёт клиента, знаешь, что законно, а что нет, и уверенно продаёшь услугу на испанском, английском и русском.</p>'+
   '<h4>Порядок</h4><ol><li><b>Зачем</b>: история и смысл кредита в США (модуль 1).</li><li><b>Как устроено</b>: система, отчёт, законы (модули 2–4), затем контрольная точка.</li><li><b>Как исправлять и растить</b>: credit repair и credit building (модули 5–6).</li><li><b>Кому и как продавать</b>: аудитории, рынок, продажи (модули 7–9).</li><li><b>Итоговый экзамен</b>.</li></ol>'+
   '<h4>Устройство урока</h4><p>Цель и время, зачем это нужно, теория, схема-выжимка, пример, ролики, первоисточники, тест, практика и итог в трёх пунктах. Термины даны на трёх языках. Источники оставлены в оригинале, суть пересказана по-русски.</p>'+
@@ -424,7 +432,7 @@ function viewLesson(x){
   h+='<div class="crumbs"><a href="#home">Содержание</a> › <span>Модуль '+m.num+'. '+esc(m.title)+'</span></div>';
   if(i===0&&m.cover&&m.cover.svg)h+='<div class="cover">'+m.cover.svg+'</div>';
   if(i===0&&m.goals&&m.goals.length)h+='<div class="callout tip"><b>После модуля ты умеешь</b><ul>'+m.goals.map(function(g){return "<li>"+esc(g)+"</li>";}).join("")+'</ul></div>';
-  h+='<div class="lhead"><div class="label">Урок '+(i+1)+' из '+m.lessons.length+'</div><h1>'+esc(l.title)+'</h1><div class="lmeta"><span class="chip num">'+(l.minutes||"?")+' мин</span>'+(lessonDone(l)?'<span class="chip ok">сдан</span>':"")+'</div></div>';
+  h+='<div class="lhead"><div class="label">Урок '+(i+1)+' из '+m.lessons.length+'</div><h1>'+esc(l.title)+'</h1><div class="lmeta"><button class="btn ghost sm" type="button" data-tts="start">▶ Читать вслух</button><span class="chip num">'+(l.minutes||"?")+' мин</span>'+(lessonDone(l)?'<span class="chip ok">сдан</span>':"")+'</div></div>';
   h+='<div class="goal"><div><div class="label">Цель</div><p>'+esc(l.goal)+'</p></div><div><div class="label">Зачем это на практике</div><p>'+esc(l.why)+'</p></div></div>';
   (l.sections||[]).forEach(function(s){h+='<section class="prose"><h2>'+esc(s.heading)+'</h2>'+html(s.html)+'</section>';});
   var imgs=(l.images||[]).filter(function(im){return /^data:image\//.test(im.src||"");});
@@ -567,6 +575,90 @@ document.addEventListener("input",function(e){
   if(t.dataset&&t.dataset.draft){S.drafts[t.dataset.draft]=t.value;save();}
   if(t.id==="gq"){var q=t.value.toLowerCase();Array.prototype.forEach.call(document.querySelectorAll("#glist .termc"),function(c){c.hidden=q&&c.textContent.toLowerCase().indexOf(q)<0;});}
 });
+
+/* ---------- read-aloud (Web Speech API) ---------- */
+var TTS={ok:("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window),active:false,paused:false,els:[],i:0,chunks:[],c:0,rate:1,gen:0};
+try{var rr=parseFloat(localStorage.getItem("crcourse.rate"));if(rr>=0.5&&rr<=2)TTS.rate=rr;}catch(e){}
+function ttsVoices(){try{return speechSynthesis.getVoices()||[];}catch(e){return[];}}
+function ttsVoice(lang){var vs=ttsVoices(),p=lang.slice(0,2),best=null;
+  vs.forEach(function(v){var l=(v.lang||"").toLowerCase().replace("_","-");if(l.indexOf(p)!==0)return;
+    var sc=(l===lang.toLowerCase()?2:1)+(/google|premium|enhanced|natural|neural/i.test(v.name)?2:0)+(v.localService?0:0);
+    if(!best||sc>best.sc)best={v:v,sc:sc};});
+  return best?best.v:null;}
+function ttsLang(el,txt){
+  if(el.closest(".es"))return "es-US";
+  if(el.closest(".en")||el.closest("pre.letter"))return "en-US";
+  if(el.closest(".ru"))return "ru-RU";
+  var cy=(txt.match(/[а-яё]/gi)||[]).length,la=(txt.match(/[a-zñáéíóúü]/gi)||[]).length;
+  if(la>cy*2&&la>8)return /[ñ¿¡áéíóú]|\b(el|la|los|las|usted|crédito|para|que)\b/i.test(txt)?"es-US":"en-US";
+  return "ru-RU";}
+function ttsCollect(){
+  var v=document.getElementById("view");
+  var all=[].slice.call(v.querySelectorAll("h1,h2,h4,p,li,pre.letter,td,th,figcaption,blockquote,.callout>b,.goal .label"));
+  all=all.filter(function(el){
+    if(el.closest(".quiz,.cards,.pager,.crumbs,.lmeta,.qbar,figure.info,.terms,.tts-bar,.chip,textarea,.photos"))return false;
+    if(!el.innerText||!el.innerText.trim())return false;
+    return true;});
+  // keep innermost only
+  return all.filter(function(el){return !all.some(function(o){return o!==el&&el.contains(o);});});}
+function ttsChunks(txt){
+  txt=txt.replace(/\s+/g," ").trim();var parts=txt.split(/(?<=[.!?…:;])\s+/),out=[];
+  parts.forEach(function(p){while(p.length>220){var k=p.lastIndexOf(",",220);if(k<80)k=p.lastIndexOf(" ",220);if(k<40)k=220;out.push(p.slice(0,k+1));p=p.slice(k+1).trim();}if(p)out.push(p);});
+  return out;}
+function ttsBar(){
+  var b=document.getElementById("ttsBar");
+  if(!TTS.active){if(b)b.remove();return;}
+  if(!b){b=document.createElement("div");b.className="tts-bar";b.id="ttsBar";document.body.appendChild(b);}
+  var rates=[0.75,0.9,1,1.15,1.3,1.5,1.75];
+  b.innerHTML='<button type="button" data-tts="prev" aria-label="Предыдущий абзац">⏮</button><button type="button" data-tts="toggle">'+(TTS.paused?"▶ Дальше":"⏸ Пауза")+'</button><button type="button" data-tts="next" aria-label="Следующий абзац">⏭</button>'+
+   '<select id="ttsRate" aria-label="Скорость">'+rates.map(function(r){return '<option value="'+r+'"'+(r===TTS.rate?" selected":"")+'>'+r+'×</option>';}).join("")+'</select>'+
+   '<span class="st">'+(TTS.i+1)+' / '+TTS.els.length+'</span><button type="button" data-tts="stop">✕ Стоп</button>';}
+function ttsMark(){
+  [].forEach.call(document.querySelectorAll(".tts-cur"),function(e){e.classList.remove("tts-cur");});
+  var el=TTS.els[TTS.i];if(!el)return;el.classList.add("tts-cur");
+  var r=el.getBoundingClientRect();if(r.top<70||r.bottom>innerHeight-90)el.scrollIntoView({block:"center",behavior:"smooth"});}
+function ttsSpeakFrom(i){
+  TTS.gen++;var g=TTS.gen;try{speechSynthesis.cancel();}catch(e){}
+  if(i<0)i=0;if(i>=TTS.els.length){ttsStop();toast("Урок прочитан до конца");return;}
+  TTS.i=i;TTS.paused=false;ttsMark();ttsBar();
+  var el=TTS.els[i],txt=el.innerText,lang=ttsLang(el,txt),ch=ttsChunks(txt),c=0;
+  function next(){
+    if(g!==TTS.gen)return;
+    if(c>=ch.length){ttsSpeakFrom(TTS.i+1);return;}
+    var u=new SpeechSynthesisUtterance(ch[c++]);u.lang=lang;var vo=ttsVoice(lang);if(vo)u.voice=vo;u.rate=TTS.rate;
+    u.onend=function(){if(g===TTS.gen)next();};
+    u.onerror=function(ev){if(g===TTS.gen&&ev.error!=="interrupted"&&ev.error!=="canceled")next();};
+    speechSynthesis.speak(u);}
+  setTimeout(next,60);}
+function ttsStart(){
+  if(!TTS.ok){toast("Этот браузер не умеет читать вслух");return;}
+  TTS.els=ttsCollect();if(!TTS.els.length)return;TTS.active=true;
+  document.documentElement.setAttribute("data-tts-ready","");
+  TTS.els.forEach(function(e){e.classList.add("tts-click");});
+  // start from first paragraph visible on screen
+  var start=0;for(var k=0;k<TTS.els.length;k++){if(TTS.els[k].getBoundingClientRect().bottom>80){start=k;break;}}
+  ttsSpeakFrom(start);}
+function ttsStop(){
+  TTS.gen++;TTS.active=false;TTS.paused=false;try{speechSynthesis.cancel();}catch(e){}
+  [].forEach.call(document.querySelectorAll(".tts-cur,.tts-click"),function(e){e.classList.remove("tts-cur","tts-click");});
+  document.documentElement.removeAttribute("data-tts-ready");ttsBar();}
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-tts]");
+  if(t){var a=t.dataset.tts;
+    if(a==="start")ttsStart();
+    else if(a==="stop")ttsStop();
+    else if(a==="next")ttsSpeakFrom(TTS.i+1);
+    else if(a==="prev")ttsSpeakFrom(TTS.i-1);
+    else if(a==="toggle"){
+      if(TTS.paused){ttsSpeakFrom(TTS.i);}  // restart paragraph: more reliable than resume() in Chrome
+      else{TTS.gen++;try{speechSynthesis.cancel();}catch(x){}TTS.paused=true;ttsBar();}}
+    return;}
+  if(TTS.active&&!e.target.closest("a,button,input,select,textarea,label")){
+    var el=e.target.closest(".tts-click");if(el){var k=TTS.els.indexOf(el);if(k>=0)ttsSpeakFrom(k);}}
+});
+document.addEventListener("change",function(e){if(e.target.id==="ttsRate"){TTS.rate=parseFloat(e.target.value);try{localStorage.setItem("crcourse.rate",String(TTS.rate));}catch(x){}if(TTS.active&&!TTS.paused)ttsSpeakFrom(TTS.i);}});
+if(TTS.ok){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=function(){};}catch(e){}}
+window.addEventListener("hashchange",function(){if(TTS.active)ttsStop();});
 window.addEventListener("hashchange",route);
 route();
 })();
