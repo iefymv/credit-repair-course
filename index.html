@@ -212,6 +212,7 @@ textarea{width:100%;min-height:140px;font:inherit;font-size:15px;padding:12px;bo
 .tts-cur{background:var(--warn-soft);box-shadow:0 0 0 4px var(--warn-soft);border-radius:4px;transition:background .2s}
 .tts-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:45;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;padding:8px 10px;border-radius:12px;background:var(--fg);color:var(--bg);box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100vw - 24px)}
 .tts-bar button,.tts-bar select{font:inherit;font-size:14px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid transparent;background:var(--bg);color:var(--fg);cursor:pointer}
+.tts-fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:44;font:inherit;font-weight:700;font-size:15px;padding:12px 18px;border-radius:999px;border:0;background:var(--accent);color:var(--bg);box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer}
 .tts-bar select#ttsVoice{max-width:150px}
 .tts-bar .st{font-size:13px;opacity:.85;padding:0 4px;white-space:nowrap}
 .btn.sm{font-size:14px;padding:6px 12px}
@@ -539,7 +540,7 @@ function route(){
   else if(id==="case")h=viewCase();
   else if(id==="sources")h=viewSources();
   else{id="home";h=viewHome();}
-  v.innerHTML=h;renderToc(id);
+  v.innerHTML=h;renderToc(id);if(typeof ttsFab==="function")ttsFab();
   document.getElementById("side").classList.remove("open");
   window.scrollTo(0,0);
 }
@@ -615,7 +616,12 @@ function ttsChunks(txt){
   txt=txt.replace(/\s+/g," ").trim();var parts=txt.split(/(?<=[.!?…:;])\s+/),out=[];
   parts.forEach(function(p){while(p.length>220){var k=p.lastIndexOf(",",220);if(k<80)k=p.lastIndexOf(" ",220);if(k<40)k=220;out.push(p.slice(0,k+1));p=p.slice(k+1).trim();}if(p)out.push(p);});
   return out;}
+function ttsFab(){
+  var f=document.getElementById("ttsFab"),want=TTS.ok&&!TTS.active&&!!document.querySelector('#view [data-tts="start"]');
+  if(!want){if(f)f.remove();return;}
+  if(!f){f=document.createElement("button");f.type="button";f.id="ttsFab";f.className="tts-fab";f.setAttribute("data-tts","start");f.textContent="▶ Слушать";document.body.appendChild(f);}}
 function ttsBar(){
+  ttsFab();
   var b=document.getElementById("ttsBar");
   if(!TTS.active){if(b)b.remove();return;}
   if(!b){b=document.createElement("div");b.className="tts-bar";b.id="ttsBar";document.body.appendChild(b);}
