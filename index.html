@@ -7,26 +7,20 @@
 <title>Credit Repair USA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 /* Layout: left ledger-style table of contents + reading column; home = "credit report" of the learner, progress shown on the FICO 300–850 scale */
+/* Layout: neobank-app look — near-black canvas, big rounded cards, pill controls, one coral→pink gradient accent; dark-first by design */
 :root{
-  --bg:#F2F4F1; --surface:#FFFFFF; --surface2:#E8ECE7; --fg:#15201C; --muted:#5C6B65; --line:#D3DAD4;
-  --accent:#1D6A4D; --accent2:#A87A1E; --good:#2E7D4F; --warn:#B7791F; --bad:#B23A3A;
-  --accent-soft:#DCEBE3; --warn-soft:#F6EBD4; --bad-soft:#F5DEDC; --law-soft:#E4E6F2; --law:#3B4C8C;
-  --font-display:"Spectral",Georgia,"Times New Roman",serif;
-  --font-body:"Golos Text",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --bg:#0A0A0B; --surface:#161618; --surface2:#222226; --fg:#F4F4F6; --muted:#9B9BA4; --line:#2C2C31;
+  --accent:#FF6A55; --accent2:#B79CFF; --good:#3DDC97; --warn:#FFB547; --bad:#FF5D7A;
+  --accent-soft:rgba(255,106,85,.14); --warn-soft:rgba(255,181,71,.14); --bad-soft:rgba(255,93,122,.14); --law-soft:rgba(183,156,255,.14); --law:#C9B6FF;
+  --grad:linear-gradient(135deg,#FF7A50 0%,#FF4F7B 55%,#B05CFF 100%);
+  --font-display:"Unbounded","Onest",system-ui,sans-serif;
+  --font-body:"Onest",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --font-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  --radius:10px; --sidebar:300px;
+  --radius:20px; --sidebar:310px; color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0E1513; --surface:#151F1B; --surface2:#1C2924; --fg:#E3ECE7; --muted:#93A39C; --line:#2A3833;
-  --accent:#4DB487; --accent2:#DDAE4E; --good:#5BC48A; --warn:#E0A64A; --bad:#E36F6F;
-  --accent-soft:#183328; --warn-soft:#33281A; --bad-soft:#3A1E1E; --law-soft:#1E2340; --law:#93A3E8; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0E1513; --surface:#151F1B; --surface2:#1C2924; --fg:#E3ECE7; --muted:#93A39C; --line:#2A3833;
-  --accent:#4DB487; --accent2:#DDAE4E; --good:#5BC48A; --warn:#E0A64A; --bad:#E36F6F;
-  --accent-soft:#183328; --warn-soft:#33281A; --bad-soft:#3A1E1E; --law-soft:#1E2340; --law:#93A3E8; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;margin:0}
@@ -232,6 +226,75 @@ textarea{width:100%;min-height:140px;font:inherit;font-size:15px;padding:12px;bo
   .mrow .meta small{text-align:left}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== neobank skin ===== */
+body{font-size:16px;letter-spacing:.005em}
+h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:-.01em}
+.side{background:var(--bg);border-right:0;padding:22px 14px 40px}
+.brand{border-bottom:0;padding:6px 10px 18px}
+.brand b{font-family:var(--font-display);font-size:20px}
+.overall{background:var(--surface);border-radius:16px;padding:14px;margin-bottom:12px}
+.bar{height:8px;border-radius:99px;background:var(--surface2)}
+.bar i{background:var(--grad);border-radius:99px}
+.toc summary{border-radius:14px;padding:10px}
+.toc summary:hover,.toc ol a:hover,.navx a:hover{background:var(--surface)}
+.toc .mnum{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--fg);font-weight:600}
+.toc ol a{border-radius:12px;padding:7px 10px}
+.toc ol a.active,.navx a.active{background:var(--accent-soft);color:var(--accent)}
+.navx{border-top:0;background:var(--surface);border-radius:16px;padding:6px}
+.navx a{border-radius:12px}
+.dot.done{background:var(--good);border-color:var(--good)}
+.main{padding-block:32px 96px}
+.hero{background:var(--grad);border:0;border-radius:28px;color:#fff;padding:32px;position:relative;overflow:hidden}
+.hero .label{color:rgba(255,255,255,.8)}
+.hero p{color:rgba(255,255,255,.88)}
+.hero h1{font-size:clamp(28px,4vw,42px)}
+.gauge{background:rgba(10,10,11,.28);border-radius:22px;padding:14px 10px 12px;backdrop-filter:blur(6px)}
+.gauge .cap{color:rgba(255,255,255,.85)}
+.stats{gap:12px}
+.stat{background:var(--surface);border:0;border-radius:20px;padding:18px}
+.stat .v{font-family:var(--font-display);font-size:26px}
+.modules{background:transparent;border:0;gap:10px;overflow:visible}
+.mrow{background:var(--surface);border:0;border-radius:20px;padding:16px 18px;grid-template-columns:52px minmax(0,1fr) 160px}
+.mrow:first-child{border-top:0}
+.mrow:hover{background:var(--surface2)}
+.mrow .n{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--surface2);font-family:var(--font-display);font-size:18px;color:var(--fg)}
+.mrow h3{font-size:17px}
+.chip{border-radius:99px;padding:3px 10px;background:var(--surface2)}
+.mrow .meta .chip{align-self:flex-start}
+.how div,.goal>div{background:var(--surface);border:0;border-radius:20px}
+.card{background:var(--surface);border:0;border-radius:20px;padding:16px 18px}
+a.card:hover{background:var(--surface2);border-color:transparent}
+.termc,.q{background:var(--surface);border:0;border-radius:20px}
+.q label{border-radius:12px}
+.q label:hover{background:var(--surface2)}
+.callout{border-radius:18px;padding:14px 18px}
+.tbl{border:0;border-radius:16px;background:var(--surface)}
+.tbl table{background:transparent}
+.tbl th{background:var(--surface2)}
+.tbl th,.tbl td{border-bottom:1px solid var(--line)}
+figure.info{background:var(--surface);border:0;border-radius:22px}
+.report,pre.letter,.script{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.report-head{border-bottom-color:var(--line)}
+.practice{background:var(--surface);border:1px solid rgba(183,156,255,.35);border-radius:22px}
+.take{background:var(--accent-soft);border-radius:22px}
+.pager a{background:var(--surface);border:0;border-radius:18px}
+.pager a:hover{background:var(--surface2)}
+.btn{border-radius:99px;border:0;background:var(--grad);color:#fff;padding:12px 22px}
+.btn.ghost{background:var(--surface2);color:var(--fg)}
+.btn.ghost:hover{background:var(--line)}
+textarea,.search{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.filters button{border-radius:99px;background:var(--surface);border:0}
+.filters button.on{background:var(--grad);color:#fff}
+.tts-fab{background:var(--grad);color:#fff}
+.tts-bar{background:var(--surface2);color:var(--fg);border-radius:99px;border:1px solid var(--line)}
+.tts-bar button,.tts-bar select{background:var(--surface);color:var(--fg);border-radius:99px}
+.toast{background:var(--surface2);color:var(--fg);border-radius:99px}
+.topbar{background:rgba(10,10,11,.85);backdrop-filter:blur(10px);border-bottom:0}
+.topbar button{border-radius:99px;background:var(--surface);border:0}
+.photos img{border:0;border-radius:18px;background:var(--surface2)}
+.cover svg{border-radius:22px}
+@media (max-width:900px){.mrow{grid-template-columns:46px minmax(0,1fr)}.side{background:var(--bg)}.hero{padding:22px;border-radius:24px}}
 </style>
 </head>
 <body>
@@ -351,9 +414,9 @@ function gauge(pct){
   bands.forEach(function(b){var f0=(b[0]-300)/550,f1=(b[1]-300)/550,p0=pt(f0,r),p1=pt(f1,r);
     s+='<path d="M'+p0[0].toFixed(1)+' '+p0[1].toFixed(1)+' A'+r+' '+r+' 0 0 1 '+p1[0].toFixed(1)+' '+p1[1].toFixed(1)+'" style="stroke:var('+b[2]+');fill:none" stroke-width="18"/>';});
   var f=(score-300)/550,n=pt(f,r-30);
-  s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+n[0].toFixed(1)+'" y2="'+n[1].toFixed(1)+'" style="stroke:var(--fg)" stroke-width="4" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="7" style="fill:var(--fg)"/>';
-  [300,580,670,740,800,850].forEach(function(v){var q=pt((v-300)/550,r+22);s+='<text x="'+q[0].toFixed(1)+'" y="'+(q[1]+4).toFixed(1)+'" text-anchor="middle" font-size="11" style="fill:var(--muted)" font-family="JetBrains Mono,monospace">'+v+'</text>';});
-  s+='<text x="'+cx+'" y="'+(cy-34)+'" text-anchor="middle" font-size="40" font-weight="700" style="fill:var(--fg)" font-family="JetBrains Mono,monospace">'+score+'</text>';
+  s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+n[0].toFixed(1)+'" y2="'+n[1].toFixed(1)+'" style="stroke:#fff" stroke-width="4" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="7" style="fill:#fff"/>';
+  [300,580,670,740,800,850].forEach(function(v){var q=pt((v-300)/550,r+22);s+='<text x="'+q[0].toFixed(1)+'" y="'+(q[1]+4).toFixed(1)+'" text-anchor="middle" font-size="11" style="fill:rgba(255,255,255,.75)" font-family="JetBrains Mono,monospace">'+v+'</text>';});
+  s+='<text x="'+cx+'" y="'+(cy-34)+'" text-anchor="middle" font-size="40" font-weight="700" style="fill:#fff" font-family="Unbounded,Onest,sans-serif">'+score+'</text>';
   return '<svg viewBox="0 0 300 170" role="img" aria-label="Учебный скор '+score+' из 850">'+s+'</svg>';
 }
 
