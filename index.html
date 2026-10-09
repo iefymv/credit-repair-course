@@ -12,7 +12,7 @@
 /* Layout: left ledger-style table of contents + reading column; home = "credit report" of the learner, progress shown on the FICO 300–850 scale */
 /* Layout: neobank-app look — near-black canvas, big rounded cards, pill controls, one coral→pink gradient accent; dark-first by design */
 :root{
-  --bg:#0A0A0B; --surface:#161618; --surface2:#222226; --fg:#F4F4F6; --muted:#9B9BA4; --line:#2C2C31;
+  --bg:#000000; --surface:#141414; --surface2:#1F1F1F; --fg:#FFFFFF; --muted:#8E8E93; --line:#2A2A2A;
   --accent:#FF6A55; --accent2:#B79CFF; --good:#3DDC97; --warn:#FFB547; --bad:#FF5D7A;
   --accent-soft:rgba(255,106,85,.14); --warn-soft:rgba(255,181,71,.14); --bad-soft:rgba(255,93,122,.14); --law-soft:rgba(183,156,255,.14); --law:#C9B6FF;
   --grad:linear-gradient(135deg,#FF7A50 0%,#FF4F7B 55%,#B05CFF 100%);
@@ -295,6 +295,23 @@ textarea,.search{background:var(--surface);border:1px solid var(--line);border-r
 .photos img{border:0;border-radius:18px;background:var(--surface2)}
 .cover svg{border-radius:22px}
 @media (max-width:900px){.mrow{grid-template-columns:46px minmax(0,1fr)}.side{background:var(--bg)}.hero{padding:22px;border-radius:24px}}
+
+/* mono-like controls + capybara mascot */
+.btn{background:#fff;color:#000}
+.btn:hover{background:#E8E8E8}
+.btn.ghost{background:var(--surface2);color:var(--fg)}
+.filters button.on{background:#fff;color:#000}
+.tts-fab{background:#fff;color:#000}
+.capy{display:block;flex:none}
+.hero{display:grid}
+.hero .capy-hero{position:absolute;right:16px;top:10px;width:140px;height:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
+.hero>div:first-child{padding-right:130px}
+.capy-res{display:inline-flex;align-items:center;gap:10px}
+.capy-res .capy{width:72px;height:auto}
+.take{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:12px;align-items:center}
+.take .capy{width:84px;height:auto}
+.empty .capy{margin:0 auto 10px;width:110px;height:auto}
+@media (max-width:900px){.hero .capy-hero{width:104px;right:8px;top:6px}.hero>div:first-child{padding-right:92px}}
 </style>
 </head>
 <body>
@@ -420,9 +437,30 @@ function gauge(pct){
   return '<svg viewBox="0 0 300 170" role="img" aria-label="Учебный скор '+score+' из 850">'+s+'</svg>';
 }
 
+
+function capy(mood,cls){
+  // original capybara mascot; moods: happy | ok | think
+  var eyes=mood==="happy"?'<path d="M77 66 q5 -6 10 0" stroke="#1A1A1A" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M113 66 q5 -6 10 0" stroke="#1A1A1A" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
+    :'<circle cx="82" cy="66" r="5.5" fill="#1A1A1A"/><circle cx="118" cy="66" r="5.5" fill="#1A1A1A"/><circle cx="84" cy="64" r="1.6" fill="#fff"/><circle cx="120" cy="64" r="1.6" fill="#fff"/>';
+  var mouth=mood==="happy"?'<path d="M92 104 q8 8 16 0" stroke="#3B2416" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    :mood==="think"?'<path d="M93 107 h14" stroke="#3B2416" stroke-width="3" stroke-linecap="round"/>'
+    :'<path d="M94 105 q6 4 12 0" stroke="#3B2416" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  var extra=mood==="think"?'<path d="M146 46 q6 10 0 14 q-6 -4 0 -14z" fill="#8FD3FF"/>':'';
+  return '<svg class="capy '+(cls||"")+'" viewBox="0 0 200 165" role="img" aria-label="Капибара">'+
+   '<ellipse cx="100" cy="150" rx="62" ry="8" fill="rgba(0,0,0,.25)"/>'+
+   '<ellipse cx="100" cy="118" rx="70" ry="38" fill="#8E5F3A"/>'+
+   '<rect x="64" y="138" width="16" height="16" rx="7" fill="#6F4729"/><rect x="120" y="138" width="16" height="16" rx="7" fill="#6F4729"/>'+
+   '<circle cx="66" cy="40" r="11" fill="#7A5133"/><circle cx="134" cy="40" r="11" fill="#7A5133"/><circle cx="66" cy="41" r="5" fill="#5A3A22"/><circle cx="134" cy="41" r="5" fill="#5A3A22"/>'+
+   '<rect x="52" y="34" width="96" height="92" rx="42" fill="#A8774B"/>'+
+   '<rect x="68" y="78" width="64" height="40" rx="20" fill="#8C5D38"/>'+
+   '<ellipse cx="90" cy="91" rx="3.2" ry="4.5" fill="#3B2416"/><ellipse cx="110" cy="91" rx="3.2" ry="4.5" fill="#3B2416"/>'+
+   eyes+mouth+
+   '<ellipse cx="70" cy="86" rx="7" ry="4" fill="#FF8A7A" opacity=".55"/><ellipse cx="130" cy="86" rx="7" ry="4" fill="#FF8A7A" opacity=".55"/>'+
+   '<circle cx="100" cy="27" r="13" fill="#FF8A1F"/><circle cx="96" cy="23" r="3" fill="#FFB45E"/><path d="M100 14 q8 -8 16 -4 q-6 8 -16 4z" fill="#3DBE6B"/>'+
+   extra+'</svg>';}
 function viewHome(){
   var t=totals();
-  var h='<section class="hero"><div><div class="label">Учебный курс · RU</div><h1>Credit Repair USA: от нуля до эксперта</h1><p>Как устроен кредит в США, как законно исправлять и растить кредитную историю, что говорят законы и как продавать услугу испано-, англо- и русскоязычным клиентам.</p></div>'+
+  var h='<section class="hero">'+capy("ok","capy-hero")+'<div><div class="label">Учебный курс · RU</div><h1>Credit Repair USA: от нуля до эксперта</h1><p>Как устроен кредит в США, как законно исправлять и растить кредитную историю, что говорят законы и как продавать услугу испано-, англо- и русскоязычным клиентам.</p></div>'+
     '<div class="gauge">'+gauge(t.pct)+'<div class="cap">Твой «учебный скор»: прогресс курса на шкале FICO 300–850.<br>Пройдено '+t.pct+'%.</div></div></section>';
   h+='<div class="stats"><div class="stat"><div class="v">'+t.ldone+'/'+t.lessons+'</div><div class="k">уроков сдано</div></div>'+
      '<div class="stat"><div class="v">'+t.tpass+'/'+t.tests+'</div><div class="k">тестов модулей</div></div>'+
@@ -510,7 +548,7 @@ function viewLesson(x){
   if(l.quiz&&l.quiz.length)h+='<section class="block"><h2>Проверь себя <small>'+l.quiz.length+' вопросов · сдача от 80%</small></h2>'+quizHtml(l.id,l.quiz)+'</section>';
   else h+='<div class="qbar"><button class="btn" type="button" data-markread="'+l.id+'">'+(S.lessons[l.id]?"Прочитано ✓":"Отметить урок пройденным")+'</button></div>';
   h+=practiceHtml(l.id,l.practice,l.title);
-  if(l.takeaways&&l.takeaways.length)h+='<div class="take"><div class="label">Итог урока</div><ol>'+l.takeaways.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+'</ol></div>';
+  if(l.takeaways&&l.takeaways.length)h+='<div class="take"><div><div class="label">Итог урока</div><ol>'+l.takeaways.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+'</ol></div>'+capy("happy")+'</div>';
   var prev=i>0?m.lessons[i-1]:null,next=i<m.lessons.length-1?m.lessons[i+1]:null;
   h+='<div class="pager">'+(prev?'<a href="#'+prev.id+'"><small>← Назад</small>'+esc(prev.title)+'</a>':"<span></span>")+
      (next?'<a class="nx" href="#'+next.id+'"><small>Дальше →</small>'+esc(next.title)+'</a>':(m.module_test&&m.module_test.length?'<a class="nx" href="#'+m.id+'-test"><small>Дальше →</small>Тест модуля</a>':""))+'</div>';
@@ -556,7 +594,7 @@ function viewGlossary(){
     src.forEach(function(t){var k=(t.en||t.ru||"").toLowerCase();if(!seen[k]){seen[k]=1;all.push(t);}});});
   all.sort(function(a,b){return (a.ru||"").localeCompare(b.ru||"","ru");});
   var h='<div class="lhead"><div class="label">Справочник</div><h1>Словарь RU · EN · ES</h1></div><input class="search" id="gq" type="search" placeholder="Найти термин на любом языке" aria-label="Поиск термина">';
-  h+=all.length?'<div id="glist">'+termsHtml(all)+'</div>':'<div class="empty">Термины появятся, когда будут готовы модули.</div>';
+  h+=all.length?'<div id="glist">'+termsHtml(all)+'</div>':'<div class="empty">'+capy("think")+'Термины появятся, когда будут готовы модули.</div>';
   return h;
 }
 
@@ -567,7 +605,7 @@ function viewCase(){
   '<div class="card"><div class="row"><span class="chip">RU</span><span class="chip num">FICO ~610</span></div><div class="t">Дмитрий Соколов, 29</div><div class="s">Sacramento, CA · приехал в 2023</div><p>Тонкое досье: одна secured card 8 месяцев и одна спорная collection на $2 300 от бывшего арендодателя. Хочет машину без грабительской ставки.</p></div></div>';
   var steps=DATA.filter(function(m){return m.case_step&&m.case_step.html;});
   if(steps.length)steps.forEach(function(m){h+='<section class="block"><h2>Модуль '+m.num+'. '+esc(m.title)+'</h2><div class="prose">'+html(m.case_step.html)+'</div></section>';});
-  else h+='<div class="empty">Шаги по клиентам появятся вместе с модулями.</div>';
+  else h+='<div class="empty">'+capy("think")+'Шаги по клиентам появятся вместе с модулями.</div>';
   return h;
 }
 
@@ -581,7 +619,7 @@ function viewSources(){
   var f=items.filter(function(x){return srcFilter==="all"||x.type===srcFilter||x.lang===srcFilter;});
   var h='<div class="lhead"><div class="label">Библиотека</div><h1>Все источники и ролики</h1><div class="lmeta"><span class="chip">'+items.length+' уникальных ссылок</span></div></div>';
   h+='<div class="filters" id="sf">'+[["all","Все"],["video","Ролики"],["read","Тексты"],["en","EN"],["es","ES"],["ru","RU"]].map(function(b){return '<button type="button" data-f="'+b[0]+'"'+(srcFilter===b[0]?' class="on"':"")+'>'+b[1]+'</button>';}).join("")+'</div>';
-  if(!items.length)return h+'<div class="empty">Источники появятся вместе с модулями.</div>';
+  if(!items.length)return h+'<div class="empty">'+capy("think")+'Источники появятся вместе с модулями.</div>';
   var v=f.filter(function(x){return x.type==="video";}).map(function(x){return x.o;}),r=f.filter(function(x){return x.type==="read";}).map(function(x){return x.o;});
   if(v.length)h+='<section class="block"><h2>Ролики <small>'+v.length+'</small></h2>'+cardsWatch(v)+'</section>';
   if(r.length)h+='<section class="block"><h2>Тексты <small>'+r.length+'</small></h2>'+cardsRead(r)+'</section>';
@@ -631,7 +669,7 @@ document.addEventListener("click",function(e){
   S.quiz[qid]={best:Math.max(pct,prev?prev.best:0),last:pct,tries:(prev?prev.tries:0)+1,first:prev&&prev.first!=null?prev.first:pct};save();
   var thr=qid==="x-final"?85:qid==="x-entry"?0:80;
   var r=document.getElementById("res-"+qid);r.className="result "+(pct>=thr?"pass":"fail");
-  r.textContent=right+" из "+data.length+" · "+pct+"% · "+(thr===0?"замер сохранён":pct>=thr?"сдано":"не сдано, нужно "+thr+"%")+" · лучший "+S.quiz[qid].best+"%";
+  r.innerHTML='<span class="capy-res">'+capy(thr===0||pct>=thr?"happy":"think")+'<span>'+esc(right+" из "+data.length+" · "+pct+"% · "+(thr===0?"замер сохранён":pct>=thr?"сдано, так держать":"не сдано, нужно "+thr+"%. Перечитай пояснения и попробуй ещё")+" · лучший "+S.quiz[qid].best+"%")+'</span></span>';
   renderToc((location.hash||"#home").slice(1));
 });
 function findQuiz(id){if(EX){if(id==="x-entry")return EX.entry;if(id==="x-checkpoint")return EX.checkpoint;if(id==="x-final")return EX.final.theory;}var r=null;DATA.forEach(function(m){if(m.id+"-test"===id)r=m.module_test;(m.lessons||[]).forEach(function(l){if(l.id===id)r=l.quiz;});});return r||[];}
