@@ -305,13 +305,42 @@ textarea,.search{background:var(--surface);border:1px solid var(--line);border-r
 .capy{display:block;flex:none}
 .hero{display:grid}
 .hero .capy-hero{position:absolute;right:16px;top:10px;width:140px;height:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
-.hero>div:first-child{padding-right:130px}
+
 .capy-res{display:inline-flex;align-items:center;gap:10px}
 .capy-res .capy{width:72px;height:auto}
-.take{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:12px;align-items:center}
+
 .take .capy{width:84px;height:auto}
 .empty .capy{margin:0 auto 10px;width:110px;height:auto}
-@media (max-width:900px){.hero .capy-hero{width:104px;right:8px;top:6px}.hero>div:first-child{padding-right:92px}}
+
+
+/* ===== Капи — компаньон ===== */
+.capi{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:43;width:118px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.capi svg{width:100%;height:auto;display:block;overflow:visible;filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
+.capi .body{transform-origin:110px 190px;animation:capiBreath 3.6s ease-in-out infinite}
+.capi .mand{transform-origin:110px 40px;animation:capiBob 2.8s ease-in-out infinite}
+.capi .eyes{transform-origin:110px 82px;transition:transform .08s}
+.capi.blink .eyes{transform:scaleY(.08)}
+.capi .ear{transform-origin:center;transition:transform .25s}
+.capi:hover .ear-l{transform:rotate(-14deg)}.capi:hover .ear-r{transform:rotate(14deg)}
+.capi .happy-eyes,.capi .drop,.capi .mouth-o,.capi .stars{display:none}
+.capi.happy .bead,.capi.happy .mouth-n{display:none}.capi.happy .happy-eyes,.capi.happy .stars{display:inline}
+.capi.think .drop{display:inline}.capi.wow .mouth-n{display:none}.capi.wow .mouth-o{display:inline}
+.capi.jump{animation:capiJump .7s cubic-bezier(.3,1.6,.5,1)}
+.capi.shake{animation:capiShake .5s}
+.capi-x{position:absolute;right:-4px;top:-4px;width:24px;height:24px;border-radius:50%;border:0;background:var(--surface2);color:var(--fg);font-size:13px;line-height:24px;text-align:center;opacity:0;transition:opacity .2s;cursor:pointer}
+.capi:hover .capi-x,.capi:focus-within .capi-x{opacity:1}
+.capi-bubble{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(212px + env(safe-area-inset-bottom,0px));z-index:44;max-width:min(320px,calc(100vw - 32px));background:#fff;color:#000;border-radius:20px 20px 6px 20px;padding:12px 16px;font-size:14.5px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transform:translateY(8px) scale(.98);transition:opacity .2s,transform .2s;pointer-events:none}
+.capi-bubble.on{opacity:1;transform:none;pointer-events:auto}
+.capi-bubble b{display:block;font-family:var(--font-display);font-size:13px;margin-bottom:3px}
+.capi-bubble .tri{font-size:12.5px;color:#555;margin-top:4px}
+@keyframes capiBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.025,0.985)}}
+@keyframes capiBob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-1px)}}
+@keyframes capiJump{0%{transform:translateY(0)}35%{transform:translateY(-34px) rotate(-6deg)}70%{transform:translateY(0) scale(1.05,.95)}100%{transform:none}}
+@keyframes capiShake{0%,100%{transform:none}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+.confetti{position:fixed;width:9px;height:14px;border-radius:2px;z-index:46;pointer-events:none;animation:conf 1.6s ease-out forwards}
+@keyframes conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+@media (max-width:900px){.capi{right:auto;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:84px}.capi-bubble{right:auto;left:12px;bottom:calc(112px + env(safe-area-inset-bottom,0px));border-radius:20px 20px 20px 6px}}
+@media (prefers-reduced-motion:reduce){.capi .body,.capi .mand{animation:none}.capi.jump,.capi.shake{animation:none}}
 </style>
 </head>
 <body>
@@ -327,6 +356,7 @@ textarea,.search{background:var(--surface);border:1px solid var(--line);border-r
         <a href="#glossary">Словарь RU · EN · ES</a>
         <a href="#case">Сквозной кейс: 3 клиента</a>
         <a href="#sources">Все источники и ролики</a>
+        <a href="#home" id="capiShow">Капи: показать капибару</a>
       </div>
     </nav>
   </aside>
@@ -460,7 +490,7 @@ function capy(mood,cls){
    extra+'</svg>';}
 function viewHome(){
   var t=totals();
-  var h='<section class="hero">'+capy("ok","capy-hero")+'<div><div class="label">Учебный курс · RU</div><h1>Credit Repair USA: от нуля до эксперта</h1><p>Как устроен кредит в США, как законно исправлять и растить кредитную историю, что говорят законы и как продавать услугу испано-, англо- и русскоязычным клиентам.</p></div>'+
+  var h='<section class="hero"><div><div class="label">Учебный курс · RU</div><h1>Credit Repair USA: от нуля до эксперта</h1><p>Как устроен кредит в США, как законно исправлять и растить кредитную историю, что говорят законы и как продавать услугу испано-, англо- и русскоязычным клиентам.</p></div>'+
     '<div class="gauge">'+gauge(t.pct)+'<div class="cap">Твой «учебный скор»: прогресс курса на шкале FICO 300–850.<br>Пройдено '+t.pct+'%.</div></div></section>';
   h+='<div class="stats"><div class="stat"><div class="v">'+t.ldone+'/'+t.lessons+'</div><div class="k">уроков сдано</div></div>'+
      '<div class="stat"><div class="v">'+t.tpass+'/'+t.tests+'</div><div class="k">тестов модулей</div></div>'+
@@ -548,7 +578,7 @@ function viewLesson(x){
   if(l.quiz&&l.quiz.length)h+='<section class="block"><h2>Проверь себя <small>'+l.quiz.length+' вопросов · сдача от 80%</small></h2>'+quizHtml(l.id,l.quiz)+'</section>';
   else h+='<div class="qbar"><button class="btn" type="button" data-markread="'+l.id+'">'+(S.lessons[l.id]?"Прочитано ✓":"Отметить урок пройденным")+'</button></div>';
   h+=practiceHtml(l.id,l.practice,l.title);
-  if(l.takeaways&&l.takeaways.length)h+='<div class="take"><div><div class="label">Итог урока</div><ol>'+l.takeaways.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+'</ol></div>'+capy("happy")+'</div>';
+  if(l.takeaways&&l.takeaways.length)h+='<div class="take"><div><div class="label">Итог урока</div><ol>'+l.takeaways.map(function(t){return "<li>"+esc(t)+"</li>";}).join("")+'</ol></div></div>';
   var prev=i>0?m.lessons[i-1]:null,next=i<m.lessons.length-1?m.lessons[i+1]:null;
   h+='<div class="pager">'+(prev?'<a href="#'+prev.id+'"><small>← Назад</small>'+esc(prev.title)+'</a>':"<span></span>")+
      (next?'<a class="nx" href="#'+next.id+'"><small>Дальше →</small>'+esc(next.title)+'</a>':(m.module_test&&m.module_test.length?'<a class="nx" href="#'+m.id+'-test"><small>Дальше →</small>Тест модуля</a>':""))+'</div>';
@@ -647,6 +677,7 @@ function route(){
 }
 
 document.addEventListener("click",function(e){
+  if(e.target.closest("#capiShow")){e.preventDefault();if(window.Capi)Capi.show();return;}
   var t=e.target.closest("button");if(!t)return;
   if(t.id==="menuBtn"){document.getElementById("side").classList.toggle("open");return;}
   if(t.id==="startDone"){S.lessons.start=!S.lessons.start;save();route();return;}
@@ -669,7 +700,8 @@ document.addEventListener("click",function(e){
   S.quiz[qid]={best:Math.max(pct,prev?prev.best:0),last:pct,tries:(prev?prev.tries:0)+1,first:prev&&prev.first!=null?prev.first:pct};save();
   var thr=qid==="x-final"?85:qid==="x-entry"?0:80;
   var r=document.getElementById("res-"+qid);r.className="result "+(pct>=thr?"pass":"fail");
-  r.innerHTML='<span class="capy-res">'+capy(thr===0||pct>=thr?"happy":"think")+'<span>'+esc(right+" из "+data.length+" · "+pct+"% · "+(thr===0?"замер сохранён":pct>=thr?"сдано, так держать":"не сдано, нужно "+thr+"%. Перечитай пояснения и попробуй ещё")+" · лучший "+S.quiz[qid].best+"%")+'</span></span>';
+  r.innerHTML='<span>'+esc(right+" из "+data.length+" · "+pct+"% · "+(thr===0?"замер сохранён":pct>=thr?"сдано, так держать":"не сдано, нужно "+thr+"%. Перечитай пояснения и попробуй ещё")+" · лучший "+S.quiz[qid].best+"%")+'</span>';
+  if(window.Capi)Capi.quiz(pct,thr);
   renderToc((location.hash||"#home").slice(1));
 });
 function findQuiz(id){if(EX){if(id==="x-entry")return EX.entry;if(id==="x-checkpoint")return EX.checkpoint;if(id==="x-final")return EX.final.theory;}var r=null;DATA.forEach(function(m){if(m.id+"-test"===id)r=m.module_test;(m.lessons||[]).forEach(function(l){if(l.id===id)r=l.quiz;});});return r||[];}
@@ -777,6 +809,98 @@ document.addEventListener("click",function(e){
 document.addEventListener("change",function(e){if(e.target.id==="ttsVoice"){try{localStorage.setItem("crcourse.voice.ru",e.target.value);}catch(x){}if(TTS.active&&!TTS.paused)ttsSpeakFrom(TTS.i);return;}if(e.target.id==="ttsRate"){TTS.rate=parseFloat(e.target.value);try{localStorage.setItem("crcourse.rate",String(TTS.rate));}catch(x){}if(TTS.active&&!TTS.paused)ttsSpeakFrom(TTS.i);}});
 if(TTS.ok){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=function(){};}catch(e){}}
 window.addEventListener("hashchange",function(){if(TTS.active)ttsStop();});
+
+/* ---------- Капи: интерактивная капибара ---------- */
+(function(){
+var TIPS=[
+ ["Загрузка лимитов","Держи загрузку карт ниже 30%, а лучше ниже 10%. Считается и общая, и по каждой карте."],
+ ["Свой отчёт — бесплатно","annualcreditreport.com: проверка собственного отчёта скор не снижает."],
+ ["7 лет + 180 дней","Collection и charge-off живут в отчёте 7 лет от даты первой просрочки + 180 дней. Не от даты продажи долга."],
+ ["Без обещаний","Нельзя обещать удалить точную негативную информацию. Это прямо сказано в раскрытии CROA."],
+ ["Hard inquiry","Жёсткий запрос виден 2 года, а на FICO влияет примерно год."],
+ ["CPN — это не лазейка","«Новый кредитный номер» вместо SSN — мошенничество. Клиенту так и говорим."],
+ ["Сроки спора","Бюро обычно отвечает за 30 дней, до 45, если клиент прислал новые документы."],
+ ["Медицинский долг","Оплаченные медицинские collections бюро в отчётах не показывают."],
+ ["Две фамилии","У испаноязычных клиентов часто бывают смешанные досье. Это лучший кейс: ошибка не их."],
+ ["Пять факторов FICO","Платежи 35%, загрузка 30%, возраст истории 15%, новые запросы 10%, структура 10%."],
+ ["Старая карта","Не закрывай старую карту без причины: она держит возраст истории и лимит."],
+ ["Продажи по телефону","По правилу TSR оплату за credit repair при продаже по телефону берут только после результата."],
+ ["Authorized user","Добавление к чужой карте помогает новичку, только если владелец платит вовремя и держит низкую загрузку."],
+ ["Банкротство","Chapter 7 может оставаться в отчёте до 10 лет."],
+ ["Experian Boost","Учитывает оплату связи и подписок, но влияет не на все версии скора."]];
+var el,bub,bubT,idleT,tipI=0,hidden=false,mx=0,my=0;
+try{hidden=localStorage.getItem("crcourse.capi")==="off";}catch(e){}
+function art(){
+ return '<svg viewBox="0 0 220 210" aria-hidden="true"><defs>'+
+ '<linearGradient id="cfur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C08B5C"/><stop offset="1" stop-color="#94623C"/></linearGradient>'+
+ '<linearGradient id="cfur2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9764B"/><stop offset="1" stop-color="#7F5232"/></linearGradient>'+
+ '<radialGradient id="cmand" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#FFB45A"/><stop offset="1" stop-color="#FF7A12"/></radialGradient>'+
+ '<linearGradient id="ccard" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF7A50"/><stop offset=".55" stop-color="#FF4F7B"/><stop offset="1" stop-color="#B05CFF"/></linearGradient></defs>'+
+ '<ellipse cx="110" cy="198" rx="70" ry="9" fill="rgba(0,0,0,.35)"/>'+
+ '<g class="body">'+
+  '<path d="M38 150 C38 112 70 96 110 96 C150 96 182 112 182 150 C182 182 152 196 110 196 C68 196 38 182 38 150Z" fill="url(#cfur2)"/>'+
+  '<rect x="62" y="176" width="22" height="20" rx="9" fill="#6E4529"/><rect x="136" y="176" width="22" height="20" rx="9" fill="#6E4529"/>'+
+  '<g class="ear ear-l"><ellipse cx="66" cy="50" rx="13" ry="11" fill="#7F5232"/><ellipse cx="66" cy="51" rx="6" ry="5" fill="#5A3820"/></g>'+
+  '<g class="ear ear-r"><ellipse cx="154" cy="50" rx="13" ry="11" fill="#7F5232"/><ellipse cx="154" cy="51" rx="6" ry="5" fill="#5A3820"/></g>'+
+  '<path d="M56 92 C56 58 80 42 110 42 C140 42 164 58 164 92 L164 112 C164 140 142 152 110 152 C78 152 56 140 56 112Z" fill="url(#cfur)"/>'+
+  '<path d="M72 100 C72 88 88 84 110 84 C132 84 148 88 148 100 L148 120 C148 136 132 144 110 144 C88 144 72 136 72 120Z" fill="#7C4F30"/>'+
+  '<path d="M84 98 C92 94 128 94 136 98" stroke="#6A4127" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+  '<ellipse cx="98" cy="108" rx="4" ry="5.5" fill="#2E1A0D"/><ellipse cx="122" cy="108" rx="4" ry="5.5" fill="#2E1A0D"/>'+
+  '<path class="mouth-n" d="M100 126 q10 8 20 0" stroke="#2E1A0D" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+  '<ellipse class="mouth-o" cx="110" cy="128" rx="6" ry="7" fill="#2E1A0D"/>'+
+  '<g class="eyes"><g class="bead"><g class="pupils"><circle cx="86" cy="80" r="7" fill="#141414"/><circle cx="134" cy="80" r="7" fill="#141414"/><circle cx="88.5" cy="77.5" r="2.3" fill="#fff"/><circle cx="136.5" cy="77.5" r="2.3" fill="#fff"/></g></g>'+
+   '<g class="happy-eyes"><path d="M79 82 q7 -9 14 0" stroke="#141414" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M127 82 q7 -9 14 0" stroke="#141414" stroke-width="4" fill="none" stroke-linecap="round"/></g></g>'+
+  '<ellipse cx="72" cy="104" rx="9" ry="5" fill="#FF8A7A" opacity=".5"/><ellipse cx="148" cy="104" rx="9" ry="5" fill="#FF8A7A" opacity=".5"/>'+
+  '<g transform="rotate(-8 110 166)"><rect x="80" y="150" width="62" height="38" rx="7" fill="url(#ccard)"/><rect x="86" y="158" width="12" height="9" rx="2" fill="#FFD27A"/><text x="136" y="182" text-anchor="end" font-size="11" font-weight="700" fill="#fff" font-family="Unbounded,Onest,sans-serif">850</text></g>'+
+  '<ellipse cx="82" cy="166" rx="11" ry="9" fill="#9A6741"/><ellipse cx="140" cy="166" rx="11" ry="9" fill="#9A6741"/>'+
+  '<g class="mand"><circle cx="110" cy="36" r="17" fill="url(#cmand)"/><circle cx="104" cy="30" r="3.5" fill="#FFD9A8" opacity=".8"/><path d="M110 20 q10 -12 22 -6 q-9 11 -22 6z" fill="#3DBE6B"/><path d="M110 21 v-5" stroke="#2C7A44" stroke-width="2.4" stroke-linecap="round"/></g>'+
+  '<path class="drop" d="M170 62 q8 12 0 17 q-8 -5 0 -17z" fill="#8FD3FF"/>'+
+  '<g class="stars" fill="#FFD27A"><path d="M30 60 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/><path d="M190 40 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5z"/></g>'+
+ '</g></svg><button type="button" class="capi-x" aria-label="Спрятать капибару">✕</button>';}
+function mood(m,ms){el.classList.remove("happy","think","wow");if(m)el.classList.add(m);if(ms)setTimeout(function(){el.classList.remove(m);},ms);}
+function anim(c){el.classList.remove("jump","shake");void el.offsetWidth;el.classList.add(c);}
+function say(title,text,extra,ms){
+ if(hidden)return;bub.innerHTML=(title?'<b>'+esc(title)+'</b>':'')+esc(text)+(extra?'<div class="tri">'+esc(extra)+'</div>':'');
+ bub.classList.add("on");clearTimeout(bubT);bubT=setTimeout(function(){bub.classList.remove("on");},ms||7000);}
+function confetti(){var cols=["#FF7A50","#FF4F7B","#B05CFF","#3DDC97","#FFD27A"],r=el.getBoundingClientRect();
+ for(var i=0;i<26;i++){var c=document.createElement("div");c.className="confetti";c.style.left=(r.left+r.width/2)+"px";c.style.top=(r.top+20)+"px";c.style.background=cols[i%5];
+  c.style.setProperty("--dx",(Math.cos(i)*(80+i*6))+"px");c.style.setProperty("--dy",(-120-Math.random()*140)+"px");c.style.setProperty("--r",(Math.random()*720)+"deg");
+  document.body.appendChild(c);setTimeout(function(x){return function(){x.remove();};}(c),1700);}}
+function lessonTerm(){var id=(location.hash||"").slice(1),x=null;DATA.forEach(function(m){(m.lessons||[]).forEach(function(l){if(l.id===id)x=l;});});
+ if(!x||!x.terms||!x.terms.length)return null;return x.terms[Math.floor(Math.random()*x.terms.length)];}
+function onClick(e){
+ if(e.target.closest(".capi-x")){hidden=true;try{localStorage.setItem("crcourse.capi","off");}catch(x){}render();toast("Капи спряталась. Вернуть — в меню слева");return;}
+ anim("jump");mood("wow",900);
+ var t=Math.random()<0.5?lessonTerm():null;
+ if(t)say("Термин урока",t.ru+": "+t.def,"EN: "+t.en+" · ES: "+t.es);
+ else{var tp=TIPS[tipI++%TIPS.length];say(tp[0],tp[1]);}}
+function blink(){if(!el||hidden)return;el.classList.add("blink");setTimeout(function(){el.classList.remove("blink");},140);setTimeout(blink,2600+Math.random()*3800);}
+function look(){if(!el||hidden)return;var p=el.querySelector(".pupils");if(!p)return;var r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height*0.38,dx=mx-cx,dy=my-cy,d=Math.max(1,Math.hypot(dx,dy)),k=Math.min(4,d/60);
+ p.setAttribute("transform","translate("+(dx/d*k).toFixed(2)+" "+(dy/d*k).toFixed(2)+")");}
+function idle(){clearTimeout(idleT);idleT=setTimeout(function(){mood("think",5000);anim("shake");say("Ты тут?","Давай ещё один урок, а я пока посторожу мандаринку.");},90000);}
+function render(){
+ if(hidden){if(el)el.remove();if(bub)bub.remove();el=bub=null;return;}
+ if(el)return;el=document.createElement("div");el.className="capi";el.setAttribute("role","button");el.setAttribute("tabindex","0");el.setAttribute("aria-label","Капибара Капи: нажми, чтобы получить подсказку");el.innerHTML=art();
+ bub=document.createElement("div");bub.className="capi-bubble";bub.setAttribute("role","status");document.body.appendChild(bub);document.body.appendChild(el);
+ el.addEventListener("click",onClick);el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();onClick(e);}});
+ setTimeout(blink,1500);}
+var greeted={};
+function onRoute(){
+ if(hidden)return;var id=(location.hash||"#home").slice(1)||"home";
+ if(greeted[id])return;greeted[id]=1;
+ if(id==="home"){var t=totals();say("Привет, я Капи",t.pct?"Ты прошёл "+t.pct+"%. Продолжим? Нажми на меня, и я дам подсказку.":"Начни со входного теста в модуле 0. А если нажмёшь на меня, расскажу полезное.",null,8000);anim("jump");}
+ else if(/-test$|^checkpoint$|^final$/.test(id)){mood("think",3000);say("Тест","Не спеши. После проверки читай пояснения, они важнее баллов.",null,6000);}
+ else if(id==="entry"){say("Входной тест","Отвечай честно, без подглядывания. Это точка отсчёта.",null,6000);}}
+window.Capi={
+ quiz:function(pct,thr){if(hidden)return;if(thr===0){mood("happy",2500);anim("jump");say("Замер есть","Сохранил твой результат. В конце курса сравним.");return;}
+  if(pct>=thr){mood("happy",3500);anim("jump");confetti();say(pct===100?"Идеально!":"Сдано!",pct===100?"Ни одной ошибки. Я в восторге.":"Ты набрал "+pct+"%. Так держать!");}
+  else{mood("think",4000);anim("shake");say("Почти",pct+"% — до зачёта не хватило. Перечитай пояснения к ошибкам и попробуй ещё.");}},
+ show:function(){hidden=false;try{localStorage.removeItem("crcourse.capi");}catch(e){}render();anim("jump");say("Я вернулась!","Нажми на меня, и я дам подсказку.");}};
+document.addEventListener("mousemove",function(e){mx=e.clientX;my=e.clientY;look();idle();},{passive:true});
+document.addEventListener("keydown",idle);document.addEventListener("touchstart",idle,{passive:true});
+window.addEventListener("hashchange",function(){setTimeout(onRoute,350);});
+render();setTimeout(onRoute,700);idle();
+})();
 window.addEventListener("hashchange",route);
 route();
 })();
