@@ -341,6 +341,27 @@ textarea,.search{background:var(--surface);border:1px solid var(--line);border-r
 @keyframes conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
 @media (max-width:900px){.capi{right:auto;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:84px}.capi-bubble{right:auto;left:12px;bottom:calc(112px + env(safe-area-inset-bottom,0px));border-radius:20px 20px 20px 6px}}
 @media (prefers-reduced-motion:reduce){.capi .body,.capi .mand{animation:none}.capi.jump,.capi.shake{animation:none}}
+
+/* ===== Капи-чат ===== */
+.cchat{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(206px + env(safe-area-inset-bottom,0px));z-index:47;width:min(400px,calc(100vw - 32px));max-height:min(62vh,600px);display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.55);overflow:hidden}
+.cchat[hidden]{display:none!important}
+.cchat-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.cchat-h b{font-family:var(--font-display);font-size:15px;flex:1}
+.cchat-h small{display:block;font-family:var(--font-body);font-weight:400;font-size:12px;color:var(--muted)}
+.cchat-h button{font:inherit;font-size:13px;border:0;border-radius:99px;padding:6px 10px;background:var(--surface2);color:var(--fg);cursor:pointer}
+.cchat-h button[aria-pressed="true"]{background:#fff;color:#000}
+.cchat-m{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.cmsg{max-width:88%;padding:10px 13px;border-radius:18px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.cmsg.u{align-self:flex-end;background:#fff;color:#000;border-bottom-right-radius:6px}
+.cmsg.a{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:6px}
+.cmsg.err{background:var(--bad-soft);color:var(--fg)}
+.cchips{display:flex;flex-wrap:wrap;gap:6px}
+.cchips button{font:inherit;font-size:13px;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:99px;padding:6px 11px;cursor:pointer}
+.cchips button:hover{background:var(--surface2)}
+.cchat-f{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.cchat-f textarea{flex:1;min-height:42px;max-height:120px;resize:none;border-radius:16px;padding:10px 12px;font-size:14.5px}
+.cchat-f button{border:0;border-radius:99px;padding:0 16px;font:inherit;font-weight:700;background:#fff;color:#000;cursor:pointer}
+@media (max-width:900px){.cchat{right:8px;left:8px;width:auto;bottom:calc(104px + env(safe-area-inset-bottom,0px));max-height:70vh}}
 </style>
 </head>
 <body>
@@ -846,6 +867,7 @@ function lessonTerm(){var id=(location.hash||"").slice(1),x=null;DATA.forEach(fu
 function onClick(e){
  if(e.target.closest(".capi-x")){hidden=true;try{localStorage.setItem("crcourse.capi","off");}catch(x){}render();toast("Капи спряталась. Вернуть — в меню слева");return;}
  anim("jump");mood("wow",900);
+ if(SAMPLE){openChat();return;}
  var t=Math.random()<0.5?lessonTerm():null;
  if(t)say("Термин урока",t.ru+": "+t.def,"EN: "+t.en+" · ES: "+t.es);
  else{var tp=TIPS[tipI++%TIPS.length];say(tp[0],tp[1]);}}
@@ -855,7 +877,7 @@ function look(){if(!el||hidden)return;var p=el.querySelector(".pupils");if(!p)re
 function idle(){clearTimeout(idleT);idleT=setTimeout(function(){mood("think",5000);anim("shake");say("Ты тут?","Давай ещё один урок, а я пока посторожу мандаринку.");},90000);}
 function render(){
  if(hidden){if(el)el.remove();if(bub)bub.remove();el=bub=null;return;}
- if(el)return;el=document.createElement("div");el.className="capi";el.setAttribute("role","button");el.setAttribute("tabindex","0");el.setAttribute("aria-label","Капибара Капи: нажми, чтобы получить подсказку");el.innerHTML=art();
+ if(el)return;el=document.createElement("div");el.className="capi";el.setAttribute("role","button");el.setAttribute("tabindex","0");el.setAttribute("aria-label","Капибара Капи: нажми, чтобы спросить или получить подсказку");el.innerHTML=art();
  bub=document.createElement("div");bub.className="capi-bubble";bub.setAttribute("role","status");document.body.appendChild(bub);document.body.appendChild(el);
  el.addEventListener("click",onClick);el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();onClick(e);}});
  setTimeout(blink,1500);}
@@ -863,9 +885,62 @@ var greeted={};
 function onRoute(){
  if(hidden)return;var id=(location.hash||"#home").slice(1)||"home";
  if(greeted[id])return;greeted[id]=1;
- if(id==="home"){var t=totals();say("Привет, я Капи",t.pct?"Ты прошёл "+t.pct+"%. Продолжим? Нажми на меня, и я дам подсказку.":"Начни со входного теста в модуле 0. А если нажмёшь на меня, расскажу полезное.",null,8000);anim("jump");}
+ if(id==="home"){var t=totals();say("Привет, я Капи",t.pct?"Ты прошёл "+t.pct+"%. Продолжим? Нажми на меня, и я дам подсказку.":(SAMPLE?"Начни со входного теста в модуле 0. Нажми на меня, если хочешь что-то спросить: я ИИ-коуч.":"Начни со входного теста в модуле 0. А если нажмёшь на меня, расскажу полезное."),null,8000);anim("jump");}
  else if(/-test$|^checkpoint$|^final$/.test(id)){mood("think",3000);say("Тест","Не спеши. После проверки читай пояснения, они важнее баллов.",null,6000);}
  else if(id==="entry"){say("Входной тест","Отвечай честно, без подглядывания. Это точка отсчёта.",null,6000);}}
+
+var SAMPLE=null,chat=null,turns=[],ctl=null,speakOn=false;
+try{speakOn=localStorage.getItem("crcourse.capiVoice")==="on";}catch(e){}
+if(window.claude&&claude.use){claude.use("sample").then(function(fn){SAMPLE=fn||null;}).catch(function(){SAMPLE=null;});}
+function strip(h){var d=document.createElement("div");d.innerHTML=h||"";return (d.textContent||"").replace(/\s+/g," ").trim();}
+function pageCtx(){
+ var id=(location.hash||"#home").slice(1)||"home",x=null,mod=null;
+ DATA.forEach(function(m){(m.lessons||[]).forEach(function(l){if(l.id===id){x=l;mod=m;}});if(id===m.id+"-test")mod=m;});
+ var outline=DATA.map(function(m){return "М"+m.num+". "+m.title+": "+(m.lessons||[]).map(function(l){return l.title;}).join("; ");}).join("\n");
+ var cur="Сейчас открыта страница: "+id+".";
+ if(x){cur="Ученик сейчас на уроке «"+x.title+"» (модуль "+mod.num+" «"+mod.title+"»).\nЦель урока: "+x.goal+"\nТекст урока:\n"+
+   (x.sections||[]).map(function(s){return "## "+s.heading+"\n"+strip(s.html);}).join("\n").slice(0,9000)+
+   "\nТермины: "+(x.terms||[]).map(function(t){return t.ru+" ("+t.en+" / "+t.es+") — "+t.def;}).join("; ").slice(0,1500)+
+   (x.example?"\nПример: "+strip(x.example.html).slice(0,1200):"");}
+ else if(/-test$|^checkpoint$|^final$|^entry$/.test(id)){cur+="\nЭто страница теста"+(mod?" модуля "+mod.num+" «"+mod.title+"»":"")+". НЕ называй правильные ответы на вопросы теста и не выбирай вариант за ученика: только наводящие вопросы и объяснение темы.";}
+ return {outline:outline,cur:cur};}
+function rules(){var c=pageCtx();
+ return "Ты — Капи, капибара с мандаринкой на голове и ИИ-коуч учебного курса «Credit Repair USA: от нуля до эксперта». Ученик учится на русском с нуля: кредитная система США, кредитный отчёт, законы (FCRA, FDCPA, CROA, правило FTC о телемаркетинге), credit repair, credit building, продажи испано-, англо- и русскоязычным клиентам. Сквозные вымышленные клиенты курса: Lucía (испаноязычная, Хьюстон, смешанное досье, хочет дом), Marcus (англоязычный, Атланта, трак, charge-off), Дмитрий (русскоязычный, Сакраменто, тонкое досье).\n"+
+ "Как отвечать: по-русски, на «ты», коротко (обычно 3–8 предложений), дружелюбно, без воды и лести; термины давай с английским и испанским вариантом; объясняй через простые примеры и клиентов курса; если ученик просит проверить себя — задай 1–3 вопроса по одному и жди ответа. Опирайся на текст урока ниже. Если вопрос про актуальные цифры, сроки или статус законов и в тексте урока этого нет — честно скажи, что нужно проверить по первоисточнику (law.cornell.edu, ftc.gov, consumerfinance.gov). Не давай юридических заключений. Никогда не одобряй CPN, продажу tradelines, ложные заявления о краже личности и обещания удалить точную информацию. Без Markdown-заголовков и таблиц: обычный текст, можно короткие списки через «—».\n\n"+
+ "Содержание курса:\n"+c.outline+"\n\n"+c.cur;}
+function add(role,text,cls){var m=document.createElement("div");m.className="cmsg "+(role==="user"?"u":"a")+(cls?" "+cls:"");m.textContent=text;chat.list.appendChild(m);chat.list.scrollTop=chat.list.scrollHeight;return m;}
+function speak(text){if(!speakOn||!TTS.ok)return;try{speechSynthesis.cancel();ttsChunks(text).forEach(function(ch){var u=new SpeechSynthesisUtterance(ch);u.lang="ru-RU";var v=ttsVoice("ru-RU");if(v)u.voice=v;u.rate=TTS.rate;speechSynthesis.speak(u);});}catch(e){}}
+var CHIPS=["Объясни этот урок проще","Проверь меня: 3 вопроса","Пример на клиенте Lucía","Что здесь важно для продаж?"];
+function buildChat(){
+ chat=document.createElement("section");chat.className="cchat";chat.hidden=true;chat.setAttribute("aria-label","Чат с Капи");
+ chat.innerHTML='<div class="cchat-h"><b>Капи<small>ИИ-коуч по курсу · отвечает Claude</small></b><button type="button" data-c="voice" aria-pressed="'+speakOn+'">Голос</button><button type="button" data-c="new">Новый</button><button type="button" data-c="close" aria-label="Закрыть">✕</button></div>'+
+  '<div class="cchat-m"></div><form class="cchat-f"><textarea id="capiInput" rows="1" placeholder="Спроси про урок, термин или клиента"></textarea><button type="submit">→</button></form>';
+ document.body.appendChild(chat);chat.list=chat.querySelector(".cchat-m");
+ chat.addEventListener("click",function(e){var b=e.target.closest("[data-c]");if(!b)return;var a=b.dataset.c;
+  if(a==="close"){chat.hidden=true;}
+  else if(a==="new"){if(ctl)ctl.abort();turns=[];chat.list.innerHTML="";greet();}
+  else if(a==="voice"){speakOn=!speakOn;b.setAttribute("aria-pressed",String(speakOn));try{localStorage.setItem("crcourse.capiVoice",speakOn?"on":"off");}catch(x){}if(!speakOn)try{speechSynthesis.cancel();}catch(x){}}
+  else if(a==="chip"){send(b.textContent);}
+  else if(a==="stop"){if(ctl)ctl.abort();}});
+ chat.querySelector("form").addEventListener("submit",function(e){e.preventDefault();var ta=chat.querySelector("textarea");var v=ta.value.trim();if(v){ta.value="";send(v);}});
+ chat.querySelector("textarea").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();chat.querySelector("form").requestSubmit();}});}
+function greet(){var m=add("assistant","Привет! Я Капи. Спрашивай про урок, термины, законы или продажи — я вижу, на какой ты странице.");
+ var c=document.createElement("div");c.className="cchips";c.innerHTML=CHIPS.map(function(t){return '<button type="button" data-c="chip">'+esc(t)+'</button>';}).join("");chat.list.appendChild(c);}
+function openChat(){if(!chat)buildChat();chat.hidden=false;if(!chat.list.children.length)greet();bub.classList.remove("on");setTimeout(function(){var ta=chat.querySelector("textarea");if(ta&&matchMedia("(min-width:901px)").matches)ta.focus();},50);}
+function send(text){
+ if(!SAMPLE){add("assistant","Чат со мной работает только в версии курса внутри Claude. Здесь могу дать совет — нажми на меня ещё раз.","err");return;}
+ if(ctl)ctl.abort();
+ add("user",text);turns.push({role:"user",content:text});if(turns.length>14)turns=turns.slice(-14);
+ var out=add("assistant","Думаю…");mood("think");ctl=new AbortController();var my=ctl;
+ SAMPLE([{role:"user",content:rules()}].concat(turns),{cache:false,signal:my.signal,onText:function(u){out.textContent=u.text;chat.list.scrollTop=chat.list.scrollHeight;}})
+ .then(function(r){turns.push({role:"assistant",content:r.text});mood("happy",2500);anim("jump");speak(r.text);if(r.truncated)add("assistant","(ответ обрезан — спроси короче)","err");})
+ .catch(function(e){mood(null);var code=e&&e.code;
+   if(code==="cancelled"){out.textContent=e.text||"Остановлено.";return;}
+   turns.pop();
+   if(code==="not_granted"||code==="sampling_disabled"||code==="not_declared"||code==="capability_disabled"){SAMPLE=null;out.textContent="Без разрешения на Claude я могу только давать советы. Разрешить можно в меню артефакта «Permissions».";out.classList.add("err");}
+   else if(code==="rate_limited"){out.textContent=(e.text?e.text+"\n\n":"")+"Слишком много вопросов подряд или кончился лимит Claude. Попробуй чуть позже.";out.classList.add("err");}
+   else if(code==="refused"){out.textContent="На это я не отвечу. Переформулируй вопрос.";out.classList.add("err");}
+   else{out.textContent=(e&&e.text?e.text+"\n\n":"")+"Связь прервалась. Отправь вопрос ещё раз.";out.classList.add("err");}});}
 window.Capi={
  quiz:function(pct,thr){if(hidden)return;if(thr===0){mood("happy",2500);anim("jump");say("Замер есть","Сохранил твой результат. В конце курса сравним.");return;}
   if(pct>=thr){mood("happy",3500);anim("jump");confetti();say(pct===100?"Идеально!":"Сдано!",pct===100?"Ни одной ошибки. Я в восторге.":"Ты набрал "+pct+"%. Так держать!");}
